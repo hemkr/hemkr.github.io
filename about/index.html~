@@ -51,7 +51,7 @@
 
 							<br class="clear">
 					</dd><!-- /.timeline-event-content -->
-				<dt id="20180522" class="timeline-event"><a>명상과 단식 30일</a></dt>
+					<dt id="20180522" class="timeline-event"><a>명상과 단식 30일</a></dt>
 					<dd class="timeline-event-content" id="20180522EX">
 						<h3>May 22, 2018</h3>
 						<p>
@@ -85,7 +85,6 @@
 					</dd><!-- /.timeline-event-content -->
 				</dl><!-- /.timeline-series -->
 				</div><!-- /.timeline-wrapper -->
-				
 				
 				<h2 class="timeline-time"><span>2017</span></h2>
 				<dl class="timeline-series">
@@ -154,8 +153,8 @@
 							<br class="clear">
 					</dd><!-- /.timeline-event-content -->
 				</dl><!-- /.timeline-series -->
-			</div><!-- /.timeline-wrapper -->
-
+						
+			
 			<div class="timeline-wrapper">
 				<h2 class="timeline-time"><span>2016</span></h2>
 				<dl class="timeline-series">
@@ -232,7 +231,7 @@
 							<br class="clear">
 					</dd><!-- /.timeline-event-content -->
 				</dl><!-- /.timeline-series -->
-			</div><!-- /.timeline-wrapper -->
+		/* </div><!-- /.timeline-wrapper --> */
 
 			<div class="timeline-wrapper">
 				<h2 class="timeline-time"><span>2015</span></h2>
