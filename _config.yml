@@ -1,6 +1,6 @@
 # Site settings
 title: JCDEV 
-email: "jcher@naver.com"
+email: jcher@naver.com
 description: "Photo Journal"
 url: "http://hemcg.github.io"
 baseurl:  
