@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tiny386</title>
+        <link rel="stylesheet" href="98.css" />
+        <style>
+            body {
+                background: #c0c0c0;
+            }
+            table {
+                background: inherit;
+            }
+            hr {
+                width: 20%;
+                margin-left: 0;
+            }
+            .window {
+                display: inline-block;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        </style>
+    </head>
+    <body>
+        <hr>
+        <div class="window" id="win1">
+            <div class="title-bar" id="tit1">
+                <div class="title-bar-text">Tiny386 / WebAssembly</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize" id="btn11"></button>
+                    <button aria-label="Maximize" id="btn12"></button>
+                    <button aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="window-body">
+                <center>
+                <canvas id="screen" width="720" height="480"
+                        style="background-color: #000000;"></canvas>
+                </center>
+                <p>
+                    <select id="configname">
+                        <option value="pwin32.ini">Win3.2</option>
+                        <option value="micro95.ini">Micro Win95</option>
+                        <option value="jslinux.ini">JSLinux</option>
+                        <option value="freedos.ini">FreeDOS</option>
+                    </select>
+                    <button id="startkey" onclick="start()">Start</button>
+                    <button onClick="window.location.reload();">Reload</button>
+                    <button onclick="request_pointer_lock()">Grab</button>
+                    <button onclick="request_fullscreen()">Fullscreen</button>
+                    <button onclick="sendCAD()">CtrlAltDel</button>
+                    <button onclick="sendMR()">RightClick</button>
+                </p>
+                <textarea id="logarea" rows="10" cols="98" style="font-family: monospace; background: inherit;" readonly></textarea>
+            </div>
+        </div>
+        <script src="unzstd.js"></script>
+        <script src="main.js"></script>
+        <hr>
+        <div class="window" id="win2">
+            <div class="title-bar inactive" id="tit2">
+                <div class="title-bar-text">Win95 on ESP32-S3</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize" id="btn21"></button>
+                    <button aria-label="Maximize" id="btn22"></button>
+                    <button aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="window-body">
+                <video src="esp32s3_win95.webm" width="720" id="video"></video>
+                <table><tr>
+                    <td><button id="playbtn">&#9654;</button></td>
+                    <td><span id="timedisp">00:00/00:00</span></td>
+                    <td width="500"><input type="range" id="timeline" value="0" min="0" max="100" step="0.1"></td>
+                </tr></table>
+            </div>
+        </div>
+        <script>
+            const video = document.getElementById('video');
+            const playbtn = document.getElementById('playbtn');
+            const timeline = document.getElementById('timeline');
+            const timedisp = document.getElementById('timedisp');
+
+            video.addEventListener('timeupdate', () => {
+                timeline.value = (video.currentTime / video.duration) * 100;
+                function f(time) {
+                    const m = Math.floor(time / 60).toString();
+                    let s = Math.floor(time % 60);
+                    if (s < 10)
+                        s = '0' + s.toString();
+                    else
+                        s = s.toString();
+                    return m + ':' + s;
+                }
+                timedisp.textContent = f(video.currentTime) + '/' + f(video.duration);
+            });
+
+            timeline.addEventListener('input', () => {
+                video.currentTime = (timeline.value / 100) * video.duration;
+            });
+
+            playbtn.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                    video.controls = true;
+                    playbtn.innerHTML = '&#9208;';
+                } else {
+                    video.pause();
+                    video.controls = false;
+                    playbtn.innerHTML = '&#9654;';
+                }
+            });
+        </script>
+        <script>
+            let zidx = 10;
+            let zobj = document.getElementById('tit1');
+            function drag(div, div1, btn1, btn2) {
+                let x, y, dragging = false;
+                function f() {
+                    if (!(zobj === undefined)) {
+                        zobj.className = "title-bar inactive";
+                    }
+                    div1.className = "title-bar";
+                    div.style.zIndex = zidx;
+                    zidx++;
+                    zobj = div1;
+                }
+
+                div.addEventListener('focusin', f);
+                div.addEventListener('mousedown', f);
+                div.addEventListener('touchstart', f);
+
+                div1.addEventListener('mousedown', (e) => {
+                    dragging = true;
+                    x = e.clientX - div.offsetLeft;
+                    y = e.clientY - div.offsetTop;
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (dragging) {
+                        div.style.left = e.clientX - x + 'px';
+                        div.style.top = e.clientY - y + 'px';
+                    }
+                });
+
+                document.addEventListener('mouseup', () => {
+                    dragging = false;
+                });
+
+                div1.addEventListener('touchstart', (e) => {
+                    dragging = true;
+                    x = e.changedTouches[0].clientX - div.offsetLeft;
+                    y = e.changedTouches[0].clientY - div.offsetTop;
+                });
+
+                document.addEventListener('touchend', () => {
+                    dragging = false;
+                });
+
+                document.addEventListener('touchmove', (e) => {
+                    if (dragging) {
+                        div.style.left = e.changedTouches[0].clientX - x + 'px';
+                        div.style.top = e.changedTouches[0].clientY - y + 'px';
+                    }
+                });
+
+                btn1.addEventListener('click', () => {
+                    div.style.position = 'static';
+                });
+
+                btn2.addEventListener('click', () => {
+                    div.style.position = 'absolute';
+                    div.style.left = '50px';
+                    div.style.top = '50px';
+                });
+            }
+
+            drag(document.getElementById('win1'), document.getElementById('tit1'), document.getElementById('btn11'), document.getElementById('btn12'));
+            drag(document.getElementById('win2'), document.getElementById('tit2'), document.getElementById('btn21'), document.getElementById('btn22'));
+        </script>
+    </body>
+</html>
