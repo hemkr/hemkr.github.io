@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+      * {
+        font-family: sans-serif;
+      }
+      p {
+        font-size: 14px;
+        margin: 8px 0;
+        color: #888;
+      }
+      .pcejs {
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+        text-align: center;
+      }
+      div.pcejs-border {
+        border: none;
+      }
+      /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+      .pcejs-canvas {
+        border: 0px none;
+      }
+      .pcejs-container {
+        margin-top: 32px;
+        text-align: center;
+      }
+
+      /* macplus has mouse integration, so we can hide the host mouse */
+      .pcejs-container canvas {
+        cursor: none;
+      }
+
+      #fullscreen-btn {
+        margin-top: 10px;
+        padding: 6px 18px;
+        font-size: 14px;
+        cursor: pointer;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+      }
+      #fullscreen-btn:hover {
+        background: #555;
+      }
+
+      /* 전체화면일 때 캔버스를 화면 꽉 채우기 */
+      :fullscreen .pcejs-canvas,
+      :-webkit-full-screen .pcejs-canvas {
+        width: 100vw !important;
+        height: 100vh !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pcejs pcejs-container">
+      <div class="pcejs pcejs-loading-status">Downloading...</div>
+      <div class="pcejs-border" id="pcejs-wrapper">
+        <canvas
+          class="pcejs pcejs-canvas"
+          oncontextmenu="event.preventDefault()"
+        ></canvas>
+      </div>
+      <button id="fullscreen-btn" onclick="toggleFullscreen()">⛶ 전체화면</button>
+    </div>
+
+    <p class="pcejs">press esc + &uarr; to zoom in, esc + &darr; to zoom out</p>
+
+    <script>
+      function toggleFullscreen() {
+        var wrapper = document.getElementById('pcejs-wrapper');
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (wrapper.requestFullscreen) {
+            wrapper.requestFullscreen();
+          } else if (wrapper.webkitRequestFullscreen) {
+            wrapper.webkitRequestFullscreen();
+          }
+          document.getElementById('fullscreen-btn').textContent = '✕ 전체화면 종료';
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+          document.getElementById('fullscreen-btn').textContent = '⛶ 전체화면';
+        }
+      }
+
+      document.addEventListener('fullscreenchange', function () {
+        if (!document.fullscreenElement) {
+          document.getElementById('fullscreen-btn').textContent = '⛶ 전체화면';
+        }
+      });
+    </script>
+
+    <script type="text/javascript" src="./pcejs-ibmpc.umd.js"></script>
+    <script type="text/javascript" src="./pcejs-util.umd.js"></script>
+    <script type="text/javascript">
+      var loadingStatus = PCEJSUtil.loadingStatus(
+        document.querySelector('.pcejs-loading-status')
+      );
+
+      PCEJSIBMPC({
+        'arguments': ['-c','pce-config.cfg','-r', '-g','vga'],
+
+        autoloadFiles: [
+          'basic-1.10.rom',
+          'ibm-pc-1982.rom',
+          'ibm-xt-1982.rom',
+          'ibmpc-pcex.rom',
+          'ibmvga.rom',
+          'hdhd.qed',
+          'pce-config.cfg',
+        ],
+
+        print: console.log.bind(console),
+        printErr: console.warn.bind(console),
+        canvas: document.querySelector('.pcejs-canvas'),
+
+        monitorRunDependencies: function (remainingDependencies) {
+          loadingStatus.update(remainingDependencies)
+        },
+      });
+    </script>
+  </body>
+</html>
